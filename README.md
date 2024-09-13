@@ -1,61 +1,74 @@
-# 🚀 Getting started with Strapi
+ran command: npx create-strapi-app@5.0.0-rc.19 min-reproduction
 
-Strapi comes with a full featured [Command Line Interface](https://docs.strapi.io/dev-docs/cli) (CLI) which lets you scaffold and manage your project in seconds.
+? Please log in or sign up.
+? Please log in or sign up. Skip
+? Do you want to use the default database (sqlite) ? (Y/n) y
+? Do you want to use the default database (sqlite) ? Yes
+? Start with an example structure & data? (Y/n) n
+? Start with an example structure & data? No
+? Start with Typescript? (Y/n) y
+? Start with Typescript? Yes
+? Install dependencies with npm? (Y/n) y
+? Install dependencies with npm? Yes
+? Initialize a git repository? (Y/n) y
+? Initialize a git repository? Yes
 
-### `develop`
+once installation ended, ran cd min*, then ran npm install @strapi/provider-email-nodemailer --save
 
-Start your Strapi application with autoReload enabled. [Learn more](https://docs.strapi.io/dev-docs/cli#strapi-develop)
+once installation ended, added following code to min-reproduction/config/plugins.ts:
 
-```
-npm run develop
-# or
-yarn develop
-```
 
-### `start`
+export default ({ env }) => ({
+  // ...
+  email: {
+    config: {
+      provider: 'nodemailer',
+      providerOptions: {
+        host: "(host)",
+        port: (port),
+        auth: {
+          user: "(user)",
+          pass: "(pass)",
+        },
+        // ... any custom nodemailer options
+      },
+      settings: {
+        defaultFrom: '(email)',
+        defaultReplyTo: '(email)',
+      },
+    },
+  },
+});
 
-Start your Strapi application with autoReload disabled. [Learn more](https://docs.strapi.io/dev-docs/cli#strapi-start)
+(...) = redacted
 
-```
-npm run start
-# or
-yarn start
-```
+ran npm run develop
 
-### `build`
+created an admin user.
 
-Build your admin panel. [Learn more](https://docs.strapi.io/dev-docs/cli#strapi-build)
+anvigated to settings > advanced settings > enable email confirmation : true && redirection url: https://example.com && save
 
-```
-npm run build
-# or
-yarn build
-```
+sent user registration request (using postman)
 
-## ⚙️ Deployment
+POST http://localhost:1337/api/auth/local/register
+(no auth)
+body (form data)
+    username: randomUsername
+    email: random@emailasdf.com
+    password:qwerty1234
 
-Strapi gives you many possible deployment options for your project including [Strapi Cloud](https://cloud.strapi.io). Browse the [deployment section of the documentation](https://docs.strapi.io/dev-docs/deployment) to find the best solution for your use case.
+response: 400 bad request
+body:
+{
+    "data": null,
+    "error": {
+        "status": 400,
+        "name": "ApplicationError",
+        "message": "Missing schema in defaultSanitizeOutput",
+        "details": {}
+    }
+}
 
-```
-yarn strapi deploy
-```
+checking strapi dashboard, user was created (see screenshot.png)
 
-## 📚 Learn more
-
-- [Resource center](https://strapi.io/resource-center) - Strapi resource center.
-- [Strapi documentation](https://docs.strapi.io) - Official Strapi documentation.
-- [Strapi tutorials](https://strapi.io/tutorials) - List of tutorials made by the core team and the community.
-- [Strapi blog](https://strapi.io/blog) - Official Strapi blog containing articles made by the Strapi team and the community.
-- [Changelog](https://strapi.io/changelog) - Find out about the Strapi product updates, new features and general improvements.
-
-Feel free to check out the [Strapi GitHub repository](https://github.com/strapi/strapi). Your feedback and contributions are welcome!
-
-## ✨ Community
-
-- [Discord](https://discord.strapi.io) - Come chat with the Strapi community including the core team.
-- [Forum](https://forum.strapi.io/) - Place to discuss, ask questions and find answers, show your Strapi project and get feedback or just talk with other Community members.
-- [Awesome Strapi](https://github.com/strapi/awesome-strapi) - A curated list of awesome things related to Strapi.
-
----
-
-<sub>🤫 Psst! [Strapi is hiring](https://strapi.io/careers).</sub>
+logged in console: [2024-09-13 18:59:08.145] http: POST /api/auth/local/register (78 ms) 400
